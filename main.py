@@ -1,6 +1,7 @@
 import sqlite3
 import globalConnection
 import login
+import sys
 
 def main():
     loginPerson = None # Neither user or artist
@@ -17,7 +18,7 @@ def main():
     print("Please input your login information")
     while True:
 
-        while (loginPerson == None):
+        while (loginPerson == None or loginPerson == ""):
             loginList = login.login()
             loginPerson = loginList[0]
             ID = loginList[1]
