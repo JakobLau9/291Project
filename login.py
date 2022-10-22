@@ -24,7 +24,7 @@ def checkArtistUser(ID, password):
     globalConnection.cursor.execute(checkUser)
     userExist = globalConnection.cursor.fetchall()
     if(userExist):
-        return "customer"
+        return "user"
 
     checkArtist = f'''
         SELECT *
