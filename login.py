@@ -60,5 +60,5 @@ def login():
         elif input == "signup":
             newID = newID()
             print("Login successfully!")
-            return ("customer", newID)
+            return ("user", newID)
     return
