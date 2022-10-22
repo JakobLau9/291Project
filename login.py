@@ -19,7 +19,7 @@ def checkArtistUser(ID, password):
     checkUser = f'''
         SELECT *
         FROM users
-        WHERE lower(uid) = {ID.lower()} and pwd = {password.lower()};
+        WHERE lower(uid) = {ID.lower()} AND pwd = '{password.lower()}';
     '''
     globalConnection.cursor.execute(checkUser)
     userExist = globalConnection.cursor.fetchall()
@@ -29,7 +29,7 @@ def checkArtistUser(ID, password):
     checkArtist = f'''
         SELECT *
         FROM artists
-        WHERE lower(aid) = {ID.lower()} and pwd = {password.lower()};
+        WHERE lower(aid) = {ID.lower()} AND pwd = '{password.lower()}';
     '''
     globalConnection.cursor.execute(checkArtist)
     artistExist = globalConnection.cursor.fetchall()
@@ -51,14 +51,14 @@ def login():
         return(check, userID)
     else:
         print("Wrong credentials! type 'retry' to try again or 'signup' to register a new account")
-        input = input()
-        while input != "retry" and input != "signup":
+        input1 = input()
+        while input1 != "retry" and input1 != "signup":
             print("Invalid command.")
-            input = input()
-        if input == "retry":
+            input1 = input("Please try again: ")
+        if input1 == "retry":
             return ("", "")
-        elif input == "signup":
-            newID = newID()
+        elif input1 == "signup":
+            newUserID = newID()
             print("Login successfully!")
-            return ("user", newID)
+            return ("user", newUserID)
     return
