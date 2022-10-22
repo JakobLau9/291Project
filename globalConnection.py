@@ -1,0 +1,2 @@
+connection = None
+cursor = None
