@@ -17,23 +17,31 @@ def main():
     globalConnection.cursor = globalConnection.connection.cursor()
 
     print("Welcome Jakob and Prabh's CMPUT 291 mini-project!!!")
-    print("Please input your login information")
+    
     while True:
 
         while (loginPerson == None or loginPerson == ""):
-            loginList = login.login()
-            loginPerson = loginList[0]
-            ID = loginList[1]
+            selectLogin = input("Would you like to login or quit?: ")
+            if(selectLogin == "login"):
+                print("Please input your login information")
+                loginList = login.login()
+                loginPerson = loginList[0]
+                ID = loginList[1]
+            elif(selectLogin == "quit"):
+                quit()
 
         if(loginPerson == "user"):
-            print("User has logged in")
+            print("User has logged in with ID: " + ID)
             user.userInputHandler(ID)
+            loginPerson = None # Neither user or artist
+            ID = None
             continue
         elif(loginPerson == "artist"):
             print("Artist %s has logged in" % ID)
             artist.artistInputHandler(ID)
-            print("exiting")
-            break
+            loginPerson = None # Neither user or artist
+            ID = None
+            continue
 
 
     return
