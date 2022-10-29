@@ -1,36 +1,41 @@
 import globalConnection
-import datetime
+from datetime import datetime
 
 # For generating unique session ID
 def generateSessionID():
     selectHighestID = f'''
-        SELECT max(sid)
+        SELECT max(sno)
         FROM sessions;
     '''
     data = globalConnection.cursor.execute(selectHighestID)
     rows = data.fetchall()
-    newID = rows[0][0] + 1
+    if(rows[0][0] != None):
+        newID = rows[0][0] + 1
+    else:
+        newID = 1
     return newID
 
 
 # Adds the session into the table and returns the ID and start time
 def startSession(userID):
     sessionID = generateSessionID()
-    timeNow = datetime.date.now()
+    timeNow = datetime.today().strftime('%Y-%m-%d')
     startSession = f'''
         INSERT INTO sessions(uid, sno, start, end) VALUES
         ('{userID}', '{sessionID}', '{timeNow}', NULL);
     '''
     globalConnection.cursor.execute(startSession)
-    globalConnection.commit()
-    print("Started session with ID: " + sessionID)
+    globalConnection.connection.commit()
+    print("Started session with ID: " + str(sessionID))
     return(sessionID, timeNow)
 
 
 # If a user was listening to a song, then it will update the listen table with the count of how long the user was listening
 def updateListen(userID, sessionID, songID, songStartTime):
-    timeEnd = datetime.date.now()
-    timeTotal = songStartTime - timeEnd
+    # TODO: FIX DATETIME FOR HERE, use .today() for songs, and datetime.today().strftime('%Y-%m-%d') for sessions
+    # timeTotal is the total time listened to this one song CURRENTLY.
+    timeEnd = datetime.today()
+    timeTotal = timeEnd - songStartTime
 
     # Getting the duration of the songs and comparing it to the time total listened to see if the entire song was listened to or not
     getSongDuration = f'''
@@ -43,7 +48,13 @@ def updateListen(userID, sessionID, songID, songStartTime):
     songDuration = rows[0][0]
 
     # listenCount holds the total duration of the song listened
-    listenCount = min(round(timeTotal.total_seconds), songDuration)
+    # If the song was listened to longer than the duration, then it will return the duration
+    # otherwise, it will return the ratio between the total time listened/song duration
+    listenCount = 0
+    if(timeTotal.total_seconds() >= songDuration):
+        listenCount = songDuration
+    else:
+        listenCount = timeTotal.total_seconds()/songDuration
 
     # Now have to check if the user has listened to this song before
     getListenData = f'''
@@ -68,7 +79,7 @@ def updateListen(userID, sessionID, songID, songStartTime):
             AND sid = {songID};
         '''
         globalConnection.cursor.execute(updateListenDuration)
-        globalConnection.commit()
+        globalConnection.connection.commit()
 
     # Else, insert the entry into listen
     else:
@@ -77,11 +88,11 @@ def updateListen(userID, sessionID, songID, songStartTime):
             ('{userID}', '{sessionID}', '{songID}', '{listenCount}');
         '''
         globalConnection.cursor.execute(enterListenDuration)
-        globalConnection.commit()
+        globalConnection.connection.commit()
     return
 
 def endSession(sessionID, sessionStartTime, userID):
-    timeEnd = datetime.datetime.now()
+    timeEnd = datetime.today().strftime('%Y-%m-%d')
     updateSessionFinished = f'''
         UPDATE sessions
         SET end = {timeEnd}
@@ -89,8 +100,8 @@ def endSession(sessionID, sessionStartTime, userID):
         AND sno = {sessionID}
     '''
     globalConnection.cursor.execute(updateSessionFinished)
-    globalConnection.commit()
-    print("Session with ID: " + sessionID + " has ended")
+    globalConnection.connection.commit()
+    print("Session with ID: " + str(sessionID) + " has ended")
     return
 
 
@@ -121,12 +132,12 @@ def userInputHandler(userID):
             onSession = False
             onSong = False
             songID = None
-        else:
+        elif (userInput == "end" and onSession == False):
             print("There is currently no ongoing sesssion")
         
         if(userInput == "start" and onSession == False):
             sessionID, sessionStartTime = startSession(userID)
             onSession = True
-        else:
+        elif(userInput == "start" and onSession == True):
             print("Already in a session with ID: " + sessionID)
 
