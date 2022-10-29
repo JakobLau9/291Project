@@ -1,3 +1,4 @@
+from re import L
 import globalConnection
 from datetime import datetime
 
@@ -149,5 +150,7 @@ def userInputHandler(userID):
             print("Already in a session with ID: " + str(sessionID))
 
         if(userInput == "select"):
-            print("Would you like to select a song, artist or playlist?")
+            userSelect = input("Would you like to select a song, artist or playlist?")
+            if(userSelect == "song"):
+                print("song")
 
