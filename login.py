@@ -1,7 +1,21 @@
 import globalConnection
 
+def checkUniqueID(userID):
+    idCheck = f'''
+        SELECT *
+        FROM users
+        WHERE uid = {userID}
+    '''
+    data = globalConnection.cursor.execute(idCheck)
+    rows = data.fetchall()
+    if(rows):
+        return False
+    return True
+
 def newID():
     newUserID = input("Please input an ID: ")
+    while (checkUniqueID(newUserID) == False):
+        newUserID = input("ID already taken, please try again: ")
     newName = input("Please input a name: ")
     newPassword = input("Please enter a password: ")
 
