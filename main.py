@@ -2,6 +2,7 @@ import sqlite3
 import globalConnection
 import login
 import sys
+import user
 
 def main():
     loginPerson = None # Neither user or artist
@@ -24,8 +25,11 @@ def main():
             ID = loginList[1]
 
         if(loginPerson == "user"):
+            print("User has logged in")
+            user.userInputHandler(ID)
             continue
         elif(loginPerson == "artist"):
+            print("Artist has logged in")
             continue
 
 
