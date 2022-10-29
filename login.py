@@ -10,7 +10,7 @@ def newID():
         ('{newUserID}', '{newName}', '{newPassword}');
         '''
     globalConnection.cursor.execute(insertNewUser)
-
+    globalConnection.connection.commit()
     print("New user registration successful!!!")
     return newUserID
 
@@ -47,7 +47,6 @@ def login():
     check = checkArtistUser(userID, password)
 
     if(check == "user" or check == "artist"):
-        print("Login Successful!")
         return(check, userID)
     else:
         print("Wrong credentials! type 'retry' to try again or 'signup' to register a new account")
@@ -59,6 +58,5 @@ def login():
             return ("", "")
         elif input1 == "signup":
             newUserID = newID()
-            print("Login successfully!")
             return ("user", newUserID)
     return
