@@ -116,6 +116,13 @@ def userInputHandler(userID):
 
     while True:
         userInput = input("Please enter your command: ")
+        if(userInput == "quit"):
+            if(onSong == True):
+                updateListen(userID, sessionID, songID, songStartTime)
+            if(onSession == True):
+                endSession(sessionID, sessionStartTime, userID)
+            quit()
+        
         if(userInput == "logout"):
             return
 
@@ -139,5 +146,8 @@ def userInputHandler(userID):
             sessionID, sessionStartTime = startSession(userID)
             onSession = True
         elif(userInput == "start" and onSession == True):
-            print("Already in a session with ID: " + sessionID)
+            print("Already in a session with ID: " + str(sessionID))
+
+        if(userInput == "select"):
+            print("Would you like to select a song, artist or playlist?")
 
