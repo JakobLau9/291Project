@@ -3,14 +3,15 @@ import globalConnection
 import login
 import sys
 import user
+import artist
 
 def main():
     loginPerson = None # Neither user or artist
     ID = None
 
-    if(len(sys.argv) != 2):
-        print("Please run this code using the format: python3 main.py <path to database>")
-        quit()
+    # if(len(sys.argv) != 2):
+    #     print("Please run this code using the format: python3 main.py <path to database>")
+    #     quit()
 
     globalConnection.connection = sqlite3.connect(sys.argv[1])
     globalConnection.cursor = globalConnection.connection.cursor()
@@ -29,8 +30,10 @@ def main():
             user.userInputHandler(ID)
             continue
         elif(loginPerson == "artist"):
-            print("Artist has logged in")
-            continue
+            print("Artist %s has logged in" % ID)
+            artist.artistInputHandler(ID)
+            print("exiting")
+            break
 
 
     return

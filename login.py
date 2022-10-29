@@ -19,8 +19,11 @@ def checkArtistUser(ID, password):
     checkUser = f'''
         SELECT *
         FROM users
-        WHERE lower(uid) = {ID.lower()} AND pwd = '{password.lower()}';
+        WHERE lower(uid) = '{ID.lower()}' AND pwd = '{password.lower()}';
     '''
+
+
+
     globalConnection.cursor.execute(checkUser)
     userExist = globalConnection.cursor.fetchall()
     if(userExist):
@@ -29,7 +32,7 @@ def checkArtistUser(ID, password):
     checkArtist = f'''
         SELECT *
         FROM artists
-        WHERE lower(aid) = {ID.lower()} AND pwd = '{password.lower()}';
+        WHERE lower(aid) = '{ID.lower()}' AND pwd = '{password.lower()}';
     '''
     globalConnection.cursor.execute(checkArtist)
     artistExist = globalConnection.cursor.fetchall()
