@@ -131,6 +131,9 @@ def artistInputHandler(artistID):
         add song
         exit
     '''
+    print("commands: ")
+    print(commands)
+
     while True:
         artistInput = input("Please enter your command: ")
         if(artistInput == "find top fans"):
