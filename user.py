@@ -239,7 +239,7 @@ def selectPlaylist(playlistID):
         print("Playlist does not exist")
     return
 
-def selectArtist(artistID):
+def selectArtists(artistID):
     selectArtistQuery = f'''
         SELECT songs.sid, songs.title, songs.duration
         FROM songs, artists, perform
@@ -312,4 +312,4 @@ def userInputHandler(userID):
             selectPlaylist(playlistID)
         elif(userInput == "select artist"):
             artistID = input("Please select an artist ID: ")
-            selectArtist(artistID)
+            selectArtists(artistID)
