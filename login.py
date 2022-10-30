@@ -1,10 +1,11 @@
 import globalConnection
 
+# Checks if the ID given is already taken
 def checkUniqueID(userID):
     idCheck = f'''
         SELECT *
         FROM users
-        WHERE uid = {userID}
+        WHERE uid = '{userID}'
     '''
     data = globalConnection.cursor.execute(idCheck)
     rows = data.fetchall()
@@ -12,6 +13,7 @@ def checkUniqueID(userID):
         return False
     return True
 
+# Created a new account for the user and returns the new ID
 def newID():
     newUserID = input("Please input an ID: ")
     while (checkUniqueID(newUserID) == False):
@@ -29,19 +31,20 @@ def newID():
     return newUserID
 
 
+# Checks if the ID and password given is a user, artist, both or neither
 def checkArtistUser(ID, password):
+    user = False    
+    artist = False
     checkUser = f'''
         SELECT *
         FROM users
         WHERE lower(uid) = '{ID.lower()}' AND pwd = '{password.lower()}';
     '''
 
-
-
     globalConnection.cursor.execute(checkUser)
     userExist = globalConnection.cursor.fetchall()
     if(userExist):
-        return "user"
+        user = True
 
     checkArtist = f'''
         SELECT *
@@ -51,8 +54,18 @@ def checkArtistUser(ID, password):
     globalConnection.cursor.execute(checkArtist)
     artistExist = globalConnection.cursor.fetchall()
     if(artistExist):
-        return "artist"
+        artist = True
 
+    
+    if(user == False and artist == False):
+        return ""
+    elif(user == True and artist == False):
+        return "user"
+    elif(user == False and artist == True):
+        return "artist"
+    elif(user == True and artist == True):
+        return "both"
+    
     return ""
 
 
@@ -63,7 +76,7 @@ def login():
     password = input("password: ")
     check = checkArtistUser(userID, password)
 
-    if(check == "user" or check == "artist"):
+    if(check == "user" or check == "artist" or check == "both"):
         return(check, userID)
     else:
         print("Wrong credentials! type 'retry' to try again or 'signup' to register a new account")
