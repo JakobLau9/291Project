@@ -239,23 +239,6 @@ def selectPlaylist(playlistID):
         print("Playlist does not exist")
     return
 
-def selectArtists(artistID):
-    selectArtistQuery = f'''
-        SELECT songs.sid, songs.title, songs.duration
-        FROM songs, artists, perform
-        WHERE songs.sid = perform.sid 
-        AND artists.aid = perform.aid 
-        AND artists.aid = "{artistID}";
-    '''
-    artistData = globalConnection.cursor.execute(selectArtistQuery)
-    artistRows = artistData.fetchall()
-    if(artistRows[0][0] != None):
-        for i in artistRows:
-            print("Song Title: " + i[1] + " ID: " + str(i[0]) + " Total Song Duration: " + str(i[2]))
-    else:
-        print("Artist does not exist or does not have any songs")
-    return
-
 
 def userInputHandler(userID):
     while True:
