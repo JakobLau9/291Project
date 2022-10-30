@@ -1,7 +1,6 @@
 import globalConnection
 
-def selectArtistHandler(artistID, userID):
-    return
-
 def searchArtistHandler(userID):
+    # it won't work
+    print("test")
     return
