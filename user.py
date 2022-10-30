@@ -242,4 +242,7 @@ def userInputHandler(userID):
             displaySongInformation(songID)
         elif(songID != None and userInput == "add"):
             addSongToPlaylist(songID, userID)
+        
+        if(userInput == "search for artists"):
+            selectArtist.searchArtistHandler(userID)
 
