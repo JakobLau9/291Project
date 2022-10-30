@@ -8,7 +8,7 @@ import user
 # and perform.aid = artists.aid
 # and ((artists.name LIKE '%y%') or (songs.title LIKE '%y'));
 
-def selectArtists(artistID):
+def selectArtists(artistID, userID):
     selectArtistQuery = f'''
         SELECT songs.sid, songs.title, songs.duration
         FROM songs, artists, perform
@@ -18,9 +18,13 @@ def selectArtists(artistID):
     '''
     artistData = globalConnection.cursor.execute(selectArtistQuery)
     artistRows = artistData.fetchall()
-    if(artistRows[0][0] != None):
-        for i in artistRows:
-            print("Song Title: " + i[1] + " ID: " + str(i[0]) + " Total Song Duration: " + str(i[2]))
+
+    if (len(artistRows) != 0):
+        print("{}'s songs".format(artistID))
+        for each in artistRows:
+            print("{} | {} | {}".format(each[0], each[1], each[2]))
+        song = input("Select a song id: ")
+        user.selectSong(song, userID)
     else:
         print("Artist does not exist or does not have any songs")
     return
@@ -86,4 +90,4 @@ def searchArtistHandler(userID):
 
 
     selection = input("you may select an artist: ")
-    selectArtists(selection)
+    selectArtists(selection, userID)
