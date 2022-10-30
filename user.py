@@ -1,14 +1,26 @@
-from re import L
 import globalConnection
 from datetime import datetime
 
 # For generating unique session ID
 def generateSessionID():
-    selectHighestID = f'''
+    selectHighestSessionID = f'''
         SELECT max(sno)
         FROM sessions;
     '''
-    data = globalConnection.cursor.execute(selectHighestID)
+    data = globalConnection.cursor.execute(selectHighestSessionID)
+    rows = data.fetchall()
+    if(rows[0][0] != None):
+        newID = rows[0][0] + 1
+    else:
+        newID = 1
+    return newID
+
+def generatePlaylistID():
+    selectHighestPlaylistID = f'''
+        SELECT max(pid)
+        FROM playlists;
+    '''
+    data = globalConnection.cursor.execute(selectHighestPlaylistID)
     rows = data.fetchall()
     if(rows[0][0] != None):
         newID = rows[0][0] + 1
@@ -32,30 +44,7 @@ def startSession(userID):
 
 
 # If a user was listening to a song, then it will update the listen table with the count of how long the user was listening
-def updateListen(userID, sessionID, songID, songStartTime):
-    # TODO: FIX DATETIME FOR HERE, use .today() for songs, and datetime.today().strftime('%Y-%m-%d') for sessions
-    # timeTotal is the total time listened to this one song CURRENTLY.
-    timeEnd = datetime.today()
-    timeTotal = timeEnd - songStartTime
-
-    # Getting the duration of the songs and comparing it to the time total listened to see if the entire song was listened to or not
-    getSongDuration = f'''
-        SELECT duration
-        FROM songs
-        WHERE sid = {songID};
-    '''
-    data = globalConnection.cursor.execute(getSongDuration)
-    rows = data.fetchall()
-    songDuration = rows[0][0]
-
-    # listenCount holds the total duration of the song listened
-    # If the song was listened to longer than the duration, then it will return the duration
-    # otherwise, it will return the ratio between the total time listened/song duration
-    listenCount = 0
-    if(timeTotal.total_seconds() >= songDuration):
-        listenCount = songDuration
-    else:
-        listenCount = timeTotal.total_seconds()/songDuration
+def updateListen(userID, sessionID, songID):
 
     # Now have to check if the user has listened to this song before
     getListenData = f'''
@@ -71,7 +60,7 @@ def updateListen(userID, sessionID, songID, songStartTime):
     # If the user has listened to the song before then update the entry
     if listenRows:
         listenTime = listenRows[0][0]
-        listenTime = listenTime + listenCount
+        listenTime = listenTime + 1
         updateListenDuration = f'''
             UPDATE listen
             SET cnt = {listenTime}
@@ -86,7 +75,7 @@ def updateListen(userID, sessionID, songID, songStartTime):
     else:
         enterListenDuration = f'''
             INSERT INTO listen VALUES
-            ('{userID}', '{sessionID}', '{songID}', '{listenCount}');
+            ('{userID}', {sessionID}, {songID}, 1.0);
         '''
         globalConnection.cursor.execute(enterListenDuration)
         globalConnection.connection.commit()
@@ -105,21 +94,98 @@ def endSession(sessionID, sessionStartTime, userID):
     print("Session with ID: " + str(sessionID) + " has ended")
     return
 
+def displaySongInformation(songID):
+    selectSongInformation = f'''
+        SELECT distinct s.sid, s.title, s.duration, a.name
+        FROM songs s, artists a, perform p
+        WHERE p.sid=s.sid and a.aid=p.aid and s.sid = {songID};
+    '''
+    playlistIncludeSong = f'''
+        SELECT playlists.title
+        FROM playlists, songs, plinclude
+        WHERE songs.sid = plinclude.sid and playlists.pid = plinclude.pid and songs.sid = {songID};
+    '''
+    informationData = globalConnection.cursor.execute(selectSongInformation)
+    informationRows = informationData.fetchall()
+
+    playlistData = globalConnection.cursor.execute(playlistIncludeSong)
+    playlistRows = playlistData.fetchall()
+
+    for i in informationRows:
+        print("song ID: " + str(i[0]))
+        print("title: " + i[1])
+        print("Duration (sec): " + str(i[2]))
+        print("Artist: " + i[3])
+    
+    print("\nPlaylists that include the song:")
+    for i in playlistRows:
+        print(i[0])
+    return
+
+def addSongToPlaylist(songID, userID):
+    playlistID = input("Please select the ID of the playlist you would like to add the song into: ")
+
+    checkPlaylist = f'''
+        SELECT *
+        FROM playlists
+        where pid = {playlistID} and uid = '{userID}';
+    '''
+    informationData = globalConnection.cursor.execute(checkPlaylist)
+    informationRows = informationData.fetchall()
+
+    # If a playlist exists then add the song into the playlist
+    if(informationRows):
+
+        #TODO: The sorder has to be one higher than the max in the playlist
+        insertSong = f'''
+        INSERT INTO plinclude VALUES ({playlistID}, {songID}, 1);
+        '''
+
+        globalConnection.cursor.execute(insertSong)
+        globalConnection.connection.commit()
+
+    # If not, then give the user the option to add it to a playlist
+    else:
+        userInput = input("Playlist does not exists, would you like to create this playlist? ")
+        if(userInput == "n" or userInput == "no"):
+            return
+        elif(userInput == "y" or userInput == "yes"):
+            playlistTitle = input("Please give this playlist a name: ")
+
+            playlistID = generatePlaylistID()
+
+            createPlaylist = f'''
+                INSERT INTO playlists(pid, title, uid) VALUES 
+                ({playlistID}, '{playlistTitle}', '{userID}');
+            '''
+            globalConnection.cursor.execute(createPlaylist)
+            globalConnection.connection.commit()
+            addSongToPlaylist = f'''
+                INSERT INTO plinclude(pid, sid, sorder) VALUES 
+                ({playlistID}, {songID}, 1);
+            '''
+            globalConnection.cursor.execute(addSongToPlaylist)
+            globalConnection.connection.commit()
+            print("Created new playlist called " + playlistTitle + " with ID: " + playlistID)
+
+    return
+
 
 def userInputHandler(userID):
     sessionID = None
     songID = None
+    ArtistID = None
+    PlaylistID = None
+
     sessionStartTime = None
-    songStartTime = None
     onSession = False
     onSong = False
     
 
     while True:
         userInput = input("Please enter your command: ")
+
         if(userInput == "quit"):
-            if(onSong == True):
-                updateListen(userID, sessionID, songID, songStartTime)
             if(onSession == True):
                 endSession(sessionID, sessionStartTime, userID)
             quit()
@@ -128,9 +194,6 @@ def userInputHandler(userID):
             return
 
         if(userInput == "end" and onSession == True):
-            if(onSong == True):
-                updateListen(userID, sessionID, songID, songStartTime)
-
             endSession(sessionID, sessionStartTime, userID)
 
             # Resetting back to default
@@ -143,14 +206,38 @@ def userInputHandler(userID):
         elif (userInput == "end" and onSession == False):
             print("There is currently no ongoing sesssion")
         
+
         if(userInput == "start" and onSession == False):
             sessionID, sessionStartTime = startSession(userID)
             onSession = True
         elif(userInput == "start" and onSession == True):
             print("Already in a session with ID: " + str(sessionID))
 
+
         if(userInput == "select"):
-            userSelect = input("Would you like to select a song, artist or playlist?")
+            userSelect = input("Would you like to select a song, artist or playlist? ")
             if(userSelect == "song"):
-                print("song")
+                userSelectSong = input("Please input the ID of the song: ")
+                songID = userSelectSong
+                print("You may now use the three commands: listen, information and add")
+            elif(userSelect == "artist"):
+                userSelectArtist = input("Please input the ID of the artist: ")
+            elif(userSelect == "playlist"):
+                userSelectPlaylist = input("Please input the ID of the playlist: ")
+
+
+        # If a song is selected then the user can listen, information, or add
+        if(songID != None and userInput == "listen"):
+            # User has staretd listening to a song and creates a session if one is not already created
+            songStartTime = datetime.today()
+            onSong = True
+            if(onSession == False):
+                sessionID, sessionStartTime = startSession(userID)
+                onSession = True
+
+            updateListen(userID, sessionID, songID)
+        elif(songID != None and userInput == "information"):
+            displaySongInformation(songID)
+        elif(songID != None and userInput == "add"):
+            addSongToPlaylist(songID, userID)
 
