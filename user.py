@@ -100,6 +100,7 @@ def updateListen(userID, sessionID, songID):
     print("Song has been added into ")
     return
 
+# For ending a session
 def endSession(sessionID, sessionStartTime, userID):
     timeEnd = datetime.today().strftime('%Y-%m-%d')
     updateSessionFinished = f'''
@@ -113,6 +114,8 @@ def endSession(sessionID, sessionStartTime, userID):
     print("Session with ID: " + str(sessionID) + " has ended")
     return
 
+# For displaying the song ID, title, duration and name of a song
+# Also the playlist title and playlist ID where the song appears
 def displaySongInformation(songID):
     selectSongInformation = f'''
         SELECT distinct s.sid, s.title, s.duration, a.name
@@ -131,8 +134,8 @@ def displaySongInformation(songID):
     playlistRows = playlistData.fetchall()
 
     for i in informationRows:
-        print("song ID: " + str(i[0]))
-        print("title: " + i[1])
+        print("Song ID: " + str(i[0]))
+        print("Title: " + i[1])
         print("Duration (sec): " + str(i[2]))
         print("Artist: " + i[3])
     
@@ -141,6 +144,8 @@ def displaySongInformation(songID):
         print("Name: " + i[0] + " ID: " + str(i[1]))
     return
 
+# Adds a give song to a playlist
+# The playlist can either already exist or be created by the user
 def addSongToPlaylist(songID, userID):
     playlistID = input("Please select the ID of the playlist you would like to add the song into: ")
 
@@ -189,8 +194,18 @@ def addSongToPlaylist(songID, userID):
 
     return
 
-def selectSong(IDSong, userID):
-    songID = IDSong
+def selectSong(songID, userID):
+    checkSongID = f'''
+        SELECT *
+        FROM songs
+        WHERE sid = {songID}
+    '''
+    songData = globalConnection.cursor.execute(checkSongID)
+    songRows = songData.fetchall()
+    if(len(songRows) == 0):
+        print("Song does not exist")
+        return
+
     print("You may now use the three commands: listen, information and add")
     userInput = input("Please enter your song command: ")
 
@@ -214,24 +229,57 @@ def selectPlaylist(playlistID):
         FROM playlists, plinclude, songs
         WHERE playlists.pid = plinclude.pid 
         AND plinclude.sid = songs.sid
-        AND playlists.pid = {playlistID}
+        AND playlists.pid = {playlistID};
     '''
     playlistData = globalConnection.cursor.execute(selectPlaylistQuery)
     playlistRows = playlistData.fetchall()
-    print("Playlist Name: " + playlistRows[0][1] + " ID: " + str(playlistRows[0][0]) + " Total Song Duration: " + str(playlistRows[0][2]))
+    if(playlistRows[0][0] != None):
+        print("Playlist Name: " + playlistRows[0][1] + " ID: " + str(playlistRows[0][0]) + " Total Song Duration: " + str(playlistRows[0][2]))
+    else:
+        print("Playlist does not exist")
+    return
+
+def selectArtist(artistID):
+    selectArtistQuery = f'''
+        SELECT songs.sid, songs.title, songs.duration
+        FROM songs, artists, perform
+        WHERE songs.sid = perform.sid 
+        AND artists.aid = perform.aid 
+        AND artists.aid = "{artistID}";
+    '''
+    artistData = globalConnection.cursor.execute(selectArtistQuery)
+    artistRows = artistData.fetchall()
+    if(artistRows[0][0] != None):
+        for i in artistRows:
+            print("Song Title: " + i[1] + " ID: " + str(i[0]) + " Total Song Duration: " + str(i[2]))
+    else:
+        print("Artist does not exist or does not have any songs")
+    return
 
 
 def userInputHandler(userID):
     while True:
-        userInput = input("Please enter your command: ")
+        userInput = input("Please enter your command or type 'command' for a list of commands: ")
 
         if(userInput == "quit"):
             if(globalConnection.onSession == True):
                 endSession(globalConnection.sessionID, globalConnection.sessionStartTime, userID)
             quit()
         
-        if(userInput == "logout"):
+        elif(userInput == "logout"):
             return
+        elif(userInput == "command"):
+            print('''
+            quit: Quits the program (exits all sessions the user is in)
+            logout: Logout of the program (does not exit sessions the user is in)
+            start: Start a session
+            end: End a sessions
+            search for artists: Allows the user to input keywords to search for artists
+            search for songs and playlists: Allows the user to input keywords to search for songs and playlists
+            select song: Select a song to either listen, see more information, or add to playlist
+            select playlist: See more information on a playlist
+            select artist: See more information on an artist
+            ''')
 
         if(userInput == "end" and globalConnection.onSession == True):
             endSession(globalConnection.sessionID, globalConnection.sessionStartTime, userID)
@@ -262,3 +310,6 @@ def userInputHandler(userID):
         elif(userInput == "select playlist"):
             playlistID = input("Please select a playlist ID: ")
             selectPlaylist(playlistID)
+        elif(userInput == "select artist"):
+            artistID = input("Please select an artist ID: ")
+            selectArtist(artistID)
