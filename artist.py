@@ -36,15 +36,71 @@ def findTopPlaylists(artistID):
         print("playlist {} has {} of your songs".format(each[0], each[1]))
     return
 
+def getCollabArtists(artistID, title, duration):
+    getCollab = f'''
+        select perform.aid
+        from perform, songs
+        where perform.sid = songs.sid
+        and lower(songs.title) = '{title.lower()}'
+        and songs.duration = '{duration}'
+        and lower(perform.aid) != '{artistID.lower()}';
+    '''
+    collab = globalConnection.cursor.execute(getCollab)
+    rows = collab.fetchall()
+
+    collabList = []
+    for each in rows:
+        collabList.append(each[0])
+    return collabList
+
+def generateSongID():
+    selectHighestID = f'''
+        SELECT max(sid)
+        FROM songs;
+    '''
+    data = globalConnection.cursor.execute(selectHighestID)
+    rows = data.fetchall()
+    newID = rows[0][0] + 1
+    return newID
+
+
+def soloAdd(artistID, sid, title, duration):
+    insertPerform = f'''
+        INSERT INTO perform(aid, sid) VALUES
+        ('{artistID}', '{sid}');
+    '''
+
+    insertSong = f'''
+        INSERT INTO songs(sid, title, duration) VALUES
+        ('{sid}', '{title}', {duration});
+    '''
+    globalConnection.cursor.execute(insertPerform)
+    globalConnection.cursor.execute(insertSong)
+    globalConnection.connection.commit()
+
+def collabAdd(artistID, sid, title, duration, collabList):
+    # add potentional collaborators
+    for each in collabList:
+        collabID = each
+        insertCollab = f'''
+            INSERT INTO perform(aid, sid) VALUES
+            ('{collabID}', '{sid}');
+        '''
+    # also add the artist and create song
+    soloAdd(artistID, sid, title, duration)
+    globalConnection.cursor.execute(insertCollab)
+    globalConnection.connection.commit()
+
+
 
 def addSong(artistID):
     title = input("Please enter a title: ")
-    duration = input("Please enter a duration: ")
+    duration = input("Please enter a duration in seconds: ")
     checkNewSong = f'''
         select songs.sid
         from perform, songs
-        where lower(perform.aid) = '{artistID.lower()}'
-        and perform.sid = songs.sid
+        where perform.sid = songs.sid
+        and lower(perform.aid) = '{artistID.lower()}'
         and lower(songs.title) = '{title.lower()}'
         and songs.duration = '{duration}';
     '''
@@ -54,8 +110,19 @@ def addSong(artistID):
     if (songExists):
         print("Rejected: song already exists")
     else:
-        print("continue to add a song")
+        # add a new song
+        # first generate new sid and get collablist
+        sid = generateSongID()
+        collabList = getCollabArtists(artistID, title, duration)
 
+        if (len(collabList) == 0): # no other collaborators, simply insert
+            soloAdd(artistID, sid, title, duration)
+            print("added song %s as new solo" % sid)
+        
+        else:
+            collabAdd(artistID, sid, title, duration, collabList)
+            print("added collab song %s" %sid)
+        
     
 def artistInputHandler(artistID):
 
@@ -66,7 +133,7 @@ def artistInputHandler(artistID):
 
         elif (artistInput == "find top playlists"):
             findTopPlaylists(artistID)
-        elif (artistInput == "add a song"):
+        elif (artistInput == "add song"):
             addSong(artistID)
 
         elif (artistInput == "exit"):
@@ -74,42 +141,3 @@ def artistInputHandler(artistID):
 
         else:
             print("invalid")
-
-
-
-
-# def userInputHandler(userID):
-#     sessionID = None
-#     songID = None
-#     sessionStartTime = None
-#     songStartTime = None
-#     onSession = False
-#     onSong = False
-    
-
-#     while True:
-#         userInput = input("Please enter your command: ")
-#         if(userInput == "logout"):
-#             return
-
-#         if(userInput == "end" and onSession == True):
-#             if(onSong == True):
-#                 updateListen(userID, sessionID, songID, songStartTime)
-
-#             endSession(sessionID, sessionStartTime, userID)
-
-#             # Resetting back to default
-#             sessionID = None
-#             sessionStartTime = None
-#             songStartTime = None
-#             onSession = False
-#             onSong = False
-#             songID = None
-#         else:
-#             print("There is currently no ongoing sesssion")
-        
-#         if(userInput == "start" and onSession == False):
-#             sessionID, sessionStartTime = startSession(userID)
-#             onSession = True
-#         else:
-#             print("Already in a session with ID: " + sessionID)
