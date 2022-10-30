@@ -21,7 +21,7 @@ def main():
     while True:
 
         while (loginPerson == None or loginPerson == ""):
-            selectLogin = input("Would you like to login or quit?: ")
+            selectLogin = input("Would you like to login or quit?: ").lower()
             if(selectLogin == "login"):
                 print("Please input your login information")
                 loginList = login.login()
