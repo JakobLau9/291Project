@@ -1,6 +1,8 @@
+from re import search
 import globalConnection
 from datetime import datetime
 import selectArtist
+import searchSongPlaylist
 
 # For generating unique session ID
 def generateSessionID():
@@ -206,6 +208,18 @@ def selectSong(IDSong, userID):
         addSongToPlaylist(songID, userID)
     return
 
+def selectPlaylist(playlistID):
+    selectPlaylistQuery = f'''
+        SELECT playlists.pid, playlists.title, sum(songs.duration)
+        FROM playlists, plinclude, songs
+        WHERE playlists.pid = plinclude.pid 
+        AND plinclude.sid = songs.sid
+        AND playlists.pid = {playlistID}
+    '''
+    playlistData = globalConnection.cursor.execute(selectPlaylistQuery)
+    playlistRows = playlistData.fetchall()
+    print("Playlist Name: " + playlistRows[0][1] + " ID: " + str(playlistRows[0][0]) + " Total Song Duration: " + str(playlistRows[0][2]))
+
 
 def userInputHandler(userID):
     while True:
@@ -239,7 +253,12 @@ def userInputHandler(userID):
         
         if(userInput == "search for artists"):
             selectArtist.searchArtistHandler(userID)
+        elif(userInput == "search for songs and playlists"):
+            searchSongPlaylist.searchSongPlaylist(userID)
 
         if(userInput == "select song"):
             songID = input("Please select a song ID: ")
             selectSong(songID, userID)
+        elif(userInput == "select playlist"):
+            playlistID = input("Please select a playlist ID: ")
+            selectPlaylist(playlistID)
