@@ -118,7 +118,7 @@ def displaySongInformation(songID):
         WHERE p.sid=s.sid and a.aid=p.aid and s.sid = {songID};
     '''
     playlistIncludeSong = f'''
-        SELECT playlists.title
+        SELECT playlists.title, playlists.pid
         FROM playlists, songs, plinclude
         WHERE songs.sid = plinclude.sid and playlists.pid = plinclude.pid and songs.sid = {songID};
     '''
@@ -136,7 +136,7 @@ def displaySongInformation(songID):
     
     print("\nPlaylists that include the song:")
     for i in playlistRows:
-        print(i[0])
+        print("Name: " + i[0] + " ID: " + str(i[1]))
     return
 
 def addSongToPlaylist(songID, userID):
