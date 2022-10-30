@@ -67,7 +67,7 @@ def updateListen(userID, sessionID, songID):
     getListenData = f'''
         SELECT cnt
         FROM listen
-        WHERE uid = {userID}
+        WHERE lower(uid) = {userID.lower()}
         AND sno = {sessionID}
         AND sid = {songID};
     '''
@@ -81,7 +81,7 @@ def updateListen(userID, sessionID, songID):
         updateListenDuration = f'''
             UPDATE listen
             SET cnt = {listenTime}
-            WHERE uid = {userID}
+            WHERE lower(uid) = {userID.lower()}
             AND sno = {sessionID}
             AND sid = {songID};
         '''
@@ -106,7 +106,7 @@ def endSession(sessionID, sessionStartTime, userID):
     updateSessionFinished = f'''
         UPDATE sessions
         SET end = {timeEnd}
-        WHERE uid = {userID}
+        WHERE lower(uid) = {userID.lower()}
         AND sno = {sessionID}
     '''
     globalConnection.cursor.execute(updateSessionFinished)
@@ -120,7 +120,7 @@ def displaySongInformation(songID):
     selectSongInformation = f'''
         SELECT distinct s.sid, s.title, s.duration, a.name
         FROM songs s, artists a, perform p
-        WHERE p.sid=s.sid and a.aid=p.aid and s.sid = {songID};
+        WHERE p.sid = s.sid and a.aid = p.aid and s.sid = {songID};
     '''
     playlistIncludeSong = f'''
         SELECT playlists.title, playlists.pid
@@ -152,7 +152,7 @@ def addSongToPlaylist(songID, userID):
     checkPlaylist = f'''
         SELECT *
         FROM playlists
-        where pid = {playlistID} and uid = '{userID}';
+        where pid = {playlistID} and lower(uid) = '{userID.lower()}';
     '''
     informationData = globalConnection.cursor.execute(checkPlaylist)
     informationRows = informationData.fetchall()
@@ -259,7 +259,7 @@ def selectArtist(artistID):
 
 def userInputHandler(userID):
     while True:
-        userInput = input("Please enter your command or type 'command' for a list of commands: ")
+        userInput = input("Please enter your command or type 'command' for a list of commands: ").lower()
 
         if(userInput == "quit"):
             if(globalConnection.onSession == True):
