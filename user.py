@@ -1,5 +1,6 @@
 import globalConnection
 from datetime import datetime
+import selectArtist
 
 # For generating unique session ID
 def generateSessionID():
@@ -222,6 +223,7 @@ def userInputHandler(userID):
                 print("You may now use the three commands: listen, information and add")
             elif(userSelect == "artist"):
                 userSelectArtist = input("Please input the ID of the artist: ")
+                selectArtist.selectArtistHandler(userSelectArtist, userID)
             elif(userSelect == "playlist"):
                 userSelectPlaylist = input("Please input the ID of the playlist: ")
 
