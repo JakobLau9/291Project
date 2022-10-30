@@ -1,5 +1,4 @@
-CMPUT 291
-Mini Project 1
+CMPUT 291 - Mini Project 1
 Jakob Lau jakob1
 Prabh Kooner prabhnoo
 
