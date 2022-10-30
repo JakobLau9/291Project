@@ -9,9 +9,9 @@ def main():
     loginPerson = None # Neither user or artist
     ID = None
 
-    # if(len(sys.argv) != 2):
-    #     print("Please run this code using the format: python3 main.py <path to database>")
-    #     quit()
+    if(len(sys.argv) != 2):
+        print("Please run this code using the format: python3 main.py <path to database>")
+        quit()
 
     globalConnection.connection = sqlite3.connect(sys.argv[1])
     globalConnection.cursor = globalConnection.connection.cursor()
@@ -42,6 +42,21 @@ def main():
             loginPerson = None # Neither user or artist
             ID = None
             continue
+        elif(loginPerson == "both"):
+            print("Artist and User detected")
+            choose = input("Would you like to login as an artist or user: ")
+            if(choose == "user"):
+                print("User has logged in with ID: " + ID)
+                user.userInputHandler(ID)
+                loginPerson = None # Neither user or artist
+                ID = None
+                continue
+            elif(choose == "artist"):
+                print("Artist %s has logged in" % ID)
+                artist.artistInputHandler(ID)
+                loginPerson = None # Neither user or artist
+                ID = None
+                continue
 
 
     return
