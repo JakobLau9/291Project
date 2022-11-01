@@ -32,14 +32,41 @@ def selectArtists(artistID, userID):
 def displayFive(rows):
     i = 0
     for each in rows:
-        print("{} | {}".format(each[0], each[1]))
+        artistID = each[0]
+        match = each[1]
+        query = f'''
+        select {match}, artists.aid, artists.name, artists.nationality, count(songs.sid)
+        from perform, songs, artists
+        where perform.sid = songs.sid
+        and perform.aid = artists.aid
+        and artists.aid = '{artistID}';
+        '''
+        # for each aid run the query
+        # print the data
+        artistData = globalConnection.cursor.execute(query)
+        artistRow = artistData.fetchone()
+        print(artistRow)
         i+=1
-        if(i == 5):
+        if (i==5):
             break
 
 def displayAll(rows):
     for each in rows:
-        print("{} | {}".format(each[0], each[1]))
+        artistID = each[0]
+        match = each[1]
+        query = f'''
+        select {match}, artists.aid, artists.name, artists.nationality, count(songs.sid)
+        from perform, songs, artists
+        where perform.sid = songs.sid
+        and perform.aid = artists.aid
+        and artists.aid = '{artistID}';
+        '''
+        # for each aid run the query
+        # print the data
+        artistData = globalConnection.cursor.execute(query)
+        artistRow = artistData.fetchone()
+        print(artistRow)
+    
 
 def display(rows):
     if len(rows) > 5:
@@ -48,7 +75,6 @@ def display(rows):
         more = input("Type 'all' to see more: ")
         if (more == "all"):
             displayAll(rows)
-
     else:
         displayAll(rows)
 
@@ -89,5 +115,5 @@ def searchArtistHandler(userID):
     globalConnection.connection.commit()
 
 
-    selection = input("you may select an artist: ")
+    selection = input("you may select an artist by id: ")
     selectArtists(selection, userID)
