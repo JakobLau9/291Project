@@ -4,13 +4,14 @@ import user
 
 # Counts the amount of keywords in a given dataset
 def countMatching(keywords, data):
-    # considered is so there are no duplicates
+    # Considered is so there are no duplicates
     considered = {}
     keywordsList = keywords.split()
 
     if ',' in data:
         data = data.replace(",", " ")
 
+    # Counting the number of times the keywords appear in the data
     dataList = data.split()
     counter = 0
     for word in dataList:
@@ -22,11 +23,13 @@ def countMatching(keywords, data):
                 counter += 1
     return counter
 
+# Outputs the songs and playlists that have the given keywords in them
 def searchSongPlaylist(userID):
     print("Please enter one or more unique keywords to search for in Songs and Playlists sperated by a space:")
     keywords = input()
     globalConnection.connection.create_function('countMatching', 2, countMatching)
 
+    # The queries use the function countMatching to count the amount of time a keyword appears in the song or playlist
     selectSongQuery = f'''
         SELECT countMatching('{keywords}', title) as matches, "song" , sid, title, duration
         FROM songs
@@ -46,6 +49,7 @@ def searchSongPlaylist(userID):
     playlistData = globalConnection.cursor.execute(selectPlaylistQuery)
     playlistRows = playlistData.fetchall()
 
+    # Creating an array based on the outputs of the queries
     if(len(playlistRows) > 0 and len(songRows) > 0):
         arr = np.concatenate((playlistRows, songRows))
 
@@ -62,6 +66,7 @@ def searchSongPlaylist(userID):
     # For sorting a 2d array
     arr = sorted(arr, key=lambda x: x[0], reverse=True)
 
+    # Printing out the queries
     count = 0
     for i in arr:
         if(count == 5):
@@ -72,6 +77,7 @@ def searchSongPlaylist(userID):
             print("Song Name: " + i[3] + " ID: " + str(i[2]) + " Song Duration: " + str(i[4]))
         count = count + 1
     
+    # Giving th euser the option to see more songs or select songs/playlists
     print("You can now: see more, select song, select playlist or exit")
     userInput = input("Please enter your command after searching: ")
 
