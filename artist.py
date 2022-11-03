@@ -129,11 +129,12 @@ def artistInputHandler(artistID):
         find top fans
         find top playlists
         add song
-        exit
+        logout
+        quit
     '''
     
     while True:
-        artistInput = input("Please enter your command: ").lower()
+        artistInput = input("Please enter your command or type 'command': ").lower()
         if(artistInput == "find top fans"):
             findTopFans(artistID)
 
