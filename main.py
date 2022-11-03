@@ -44,7 +44,7 @@ def main():
             continue
         elif(loginPerson == "both"):
             print("Artist and User detected")
-            choose = input("Would you like to login as an artist or user: ")
+            choose = input("Would you like to login as an artist or user: ").lower()
             if(choose == "user"):
                 print("User has logged in with ID: " + ID)
                 user.userInputHandler(ID)
