@@ -76,8 +76,11 @@ def login():
     password = input("password: ")
     check = checkArtistUser(userID, password)
 
+    # Returning if the credentials are valid
     if(check == "user" or check == "artist" or check == "both"):
         return(check, userID)
+
+    # Giving the user the option to retry their login or to signup a new user
     else:
         print("Wrong credentials! type 'retry' to try again or 'signup' to register a new account")
         input1 = input()
