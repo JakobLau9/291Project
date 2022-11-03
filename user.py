@@ -18,6 +18,7 @@ def generateSessionID():
         newID = 1
     return newID
 
+# For generating unique playlist ID
 def generatePlaylistID():
     selectHighestPlaylistID = f'''
         SELECT max(pid)
@@ -32,6 +33,7 @@ def generatePlaylistID():
     print(newID)
     return newID
 
+# For generating the next numbered Sorder when addings songs to a playlist
 def generateSorder(playlistID):
     selectHighestPlaylistID = f'''
         SELECT max(sorder)
@@ -194,7 +196,9 @@ def addSongToPlaylist(songID, userID):
 
     return
 
+# Whenever a user selects a song, then it will be given to the selectSong function
 def selectSong(songID, userID):
+    # Checks if the song exists 
     checkSongID = f'''
         SELECT *
         FROM songs
@@ -223,7 +227,9 @@ def selectSong(songID, userID):
         addSongToPlaylist(songID, userID)
     return
 
+# Whenever a user selects a playlist, then it will be given to the selectPlaylist function
 def selectPlaylist(playlistID):
+    # Checks if the playlist exists and also grabs the needed parameters from the database
     selectPlaylistQuery = f'''
         SELECT playlists.pid, playlists.title, sum(songs.duration)
         FROM playlists, plinclude, songs
@@ -239,7 +245,9 @@ def selectPlaylist(playlistID):
         print("Playlist does not exist")
     return
 
+# Whenever a user selects a artist, then it will be given to the selectArtist function
 def selectArtists(artistID):
+    # Checks if the artist exists and also grabs the needed parameters from the database
     selectArtistQuery = f'''
         SELECT songs.sid, songs.title, songs.duration
         FROM songs, artists, perform
@@ -256,18 +264,20 @@ def selectArtists(artistID):
         print("Artist does not exist or does not have any songs")
     return
 
-
+# This handles all of the possible user inputs.
 def userInputHandler(userID):
     while True:
         userInput = input("Please enter your command or type 'command' for a list of commands: ").lower()
 
+        # Quits the program
         if(userInput == "quit"):
             if(globalConnection.onSession == True):
                 endSession(globalConnection.sessionID, globalConnection.sessionStartTime, userID)
             quit()
-        
+        # logout so that another user or artist can login
         elif(userInput == "logout"):
             return
+        # Prints out the possible commands and what they do for a user
         elif(userInput == "command"):
             print('''
             quit: Quits the program (exits all sessions the user is in)
@@ -280,7 +290,8 @@ def userInputHandler(userID):
             select playlist: See more information on a playlist
             select artist: See more information on an artist
             ''')
-
+        
+        # end will always check if the user is in session before attempting to end a session.
         if(userInput == "end" and globalConnection.onSession == True):
             endSession(globalConnection.sessionID, globalConnection.sessionStartTime, userID)
 
@@ -291,19 +302,20 @@ def userInputHandler(userID):
         elif (userInput == "end" and globalConnection.onSession == False):
             print("There is currently no ongoing sesssion")
         
-
+        # Start will not start if the user is already in a session.
         if(userInput == "start" and globalConnection.onSession == False):
             globalConnection.sessionID, globalConnection.sessionStartTime = startSession(userID)
             globalConnection.onSession = True
         elif(userInput == "start" and globalConnection.onSession == True):
             print("Already in a session with ID: " + str(globalConnection.sessionID))
         
-        
+        # searching for artists, songs or playlists with keywords
         if(userInput == "search for artists"):
             selectArtist.searchArtistHandler(userID)
         elif(userInput == "search for songs and playlists"):
             searchSongPlaylist.searchSongPlaylist(userID)
 
+        # calls the corresponding select functions
         if(userInput == "select song"):
             songID = input("Please select a song ID: ")
             selectSong(songID, userID)
