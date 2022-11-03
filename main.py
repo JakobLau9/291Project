@@ -23,7 +23,7 @@ def main():
     while True:
         # Checking if the input is a user or artist or both
         while (loginPerson == None or loginPerson == ""):
-            selectLogin = input("Would you like to login or quit?: ").lower()
+            selectLogin = input("Would you like to login, signup or quit?: ").lower()
             if(selectLogin == "login"):
                 print("Please input your login information")
                 loginList = login.login()
@@ -31,6 +31,9 @@ def main():
                 ID = loginList[1]
             elif(selectLogin == "quit"):
                 quit()
+            elif(selectLogin == "signup"):
+                ID = login.newID()
+                loginPerson = "user"
 
         if(loginPerson == "user"):
             print("User has logged in with ID: " + ID)
