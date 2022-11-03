@@ -131,11 +131,9 @@ def artistInputHandler(artistID):
         add song
         exit
     '''
-    print("commands: ")
-    print(commands)
-
+    
     while True:
-        artistInput = input("Please enter your command: ")
+        artistInput = input("Please enter your command: ").lower()
         if(artistInput == "find top fans"):
             findTopFans(artistID)
 
@@ -144,8 +142,14 @@ def artistInputHandler(artistID):
         elif (artistInput == "add song"):
             addSong(artistID)
 
-        elif (artistInput == "exit"):
+        elif (artistInput == "logout"):
             return
 
+        elif (artistInput == "quit"):
+            quit()
+
+        elif(artistInput == "command"):
+            print(commands)
+        
         else:
             print("invalid")
