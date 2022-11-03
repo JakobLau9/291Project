@@ -9,17 +9,19 @@ def main():
     loginPerson = None # Neither user or artist
     ID = None
 
+    # Checking if a database is given
     if(len(sys.argv) != 2):
         print("Please run this code using the format: python3 main.py <path to database>")
         quit()
 
+    # These are the variables that the functions will use to do SQL queries
     globalConnection.connection = sqlite3.connect(sys.argv[1])
     globalConnection.cursor = globalConnection.connection.cursor()
 
     print("Welcome Jakob and Prabh's CMPUT 291 mini-project!!!")
     
     while True:
-
+        # Checking if the input is a user or artist or both
         while (loginPerson == None or loginPerson == ""):
             selectLogin = input("Would you like to login or quit?: ").lower()
             if(selectLogin == "login"):
@@ -33,13 +35,17 @@ def main():
         if(loginPerson == "user"):
             print("User has logged in with ID: " + ID)
             user.userInputHandler(ID)
-            loginPerson = None # Neither user or artist
+
+            # Resesting for when the user logouts
+            loginPerson = None
             ID = None
             continue
         elif(loginPerson == "artist"):
             print("Artist %s has logged in" % ID)
             artist.artistInputHandler(ID)
-            loginPerson = None # Neither user or artist
+
+            # Resesting for when the artist logouts
+            loginPerson = None 
             ID = None
             continue
         elif(loginPerson == "both"):
@@ -48,13 +54,13 @@ def main():
             if(choose == "user"):
                 print("User has logged in with ID: " + ID)
                 user.userInputHandler(ID)
-                loginPerson = None # Neither user or artist
+                loginPerson = None 
                 ID = None
                 continue
             elif(choose == "artist"):
                 print("Artist %s has logged in" % ID)
                 artist.artistInputHandler(ID)
-                loginPerson = None # Neither user or artist
+                loginPerson = None 
                 ID = None
                 continue
 
