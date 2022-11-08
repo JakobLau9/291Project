@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# echo hi
+
+# mkdir data
+# chmod 777 /data
+# sudo mongod --port smth --dbpath /data 
+# sudo mongosh --port smth
+
+# server in bg and then client
+# mongod --port 27012 --dbpath data &
+# mongosh --port 27012
+
+# mongoimport --db 291db --collection dblp --file dblp-ref-10.json --batchSize 1
+
+# sqlite3 a2.db <a2-tables.sql
+# sqlite3 a2.db <a2-data.sqll
+# sqlite3 a2.db <a2-solution.sql
