@@ -12,6 +12,9 @@ import article
 import author
 
 def createCollection():
+    global db
+    global dblp
+    global client
     # TODO: port number is hardcoded cuz i don't want to type it everytime, we'll change at the end
     # TODO: json file name is hardcoded cuz im lazy
     
@@ -32,8 +35,10 @@ def createCollection():
     
     # TODO: don't know if this is allowed seems too clean
     # wowie wow im so clean
-    cmd = "mongoimport --db 291db --collection dblp --file dblp-ref-1k.json --batchSize 1"
+    cmd = "mongoimport --db 291db --collection dblp --file dblp-ref-10.json --batchSize 1"
     os.system(cmd)
+    
+    
 
 def main():
     createCollection()
