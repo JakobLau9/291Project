@@ -4,7 +4,7 @@
 
 # mkdir data
 # chmod 777 /data
-# sudo mongod --port smth --dbpath /data 
+# sudo mongod --port smth --dbpath data 
 # sudo mongosh --port smth
 
 # server in bg and then client
