@@ -16,8 +16,6 @@ def createCollection():
     global db
     global dblp
     global client
-    # TODO: port number is hardcoded cuz i don't want to type it everytime, we'll change at the end
-    # TODO: json file name is hardcoded cuz im lazy
     
     file_name = sys.argv[1] # example: dblp-ref-10.json
     port = sys.argv[2] # example: 27017
@@ -35,9 +33,6 @@ def createCollection():
         dblp = db["dblp"]
         
     # insert json file data into collection
-    
-    # TODO: don't know if this is allowed seems too clean
-    # wowie wow im so clean
     cmd = f"mongoimport --db 291db --collection dblp --file {file_name} --batchSize 1"
     os.system(cmd)
     
