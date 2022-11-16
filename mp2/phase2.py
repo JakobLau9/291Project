@@ -11,10 +11,12 @@ import venue
 import addArticle
 import article
 import author
+from pprint import pprint
 
 
 
 def main():
+    
     global db
     global dblp
     global client
