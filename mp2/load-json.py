@@ -33,7 +33,9 @@ def createCollection():
         dblp = db["dblp"]
         
     # insert json file data into collection
-    cmd = f"mongoimport --db 291db --collection dblp --file {file_name} --batchSize 100"
+    # insert json file data into collection
+    print("importing ...")
+    cmd = f"mongoimport --port {port} --db 291db --collection dblp --file {file_name} --batchSize 100"
     os.system(cmd)
     
     
