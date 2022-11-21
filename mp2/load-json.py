@@ -1,5 +1,6 @@
 import pymongo
-from pymongo import MongoClient 
+from pymongo import MongoClient
+from pymongo import TEXT
 import json
 import sys
 import os
@@ -43,13 +44,17 @@ def createCollection():
     # create indexes
     db.dblp.drop_indexes()
     print("creating indexes ...")
-    db.dblp.create_index('abstract')
-    db.dblp.create_index('authors')
-    db.dblp.create_index('n_citation')
-    db.dblp.create_index('references')
-    db.dblp.create_index('venue')
-    db.dblp.create_index('year')
-    db.dblp.create_index('id')
+    
+    # db.dblp.create_index([('authors', TEXT)], name='author_index')
+    
+    # we can only have 1 text index
+    # this is ok for search for articles
+    # for search for authors you need to get rid of the other text matches
+    db.dblp.create_index([('authors', TEXT), ('title', TEXT), ('abstract', TEXT), ('venue', TEXT), ('year', TEXT)], name='author_index')
+    
+    #unique id index for add article checking
+    db.dblp.create_index( "id", unique=True, name='uniq_id_index' )
+    
     # displaying all indexes
     info = db.dblp.index_information()
     for i in info:

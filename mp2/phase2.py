@@ -33,6 +33,7 @@ def main():
     cmds = '''
         search for articles
         search for authors
+        select author
         list venues
         add an article
         exit
@@ -50,12 +51,19 @@ def main():
             
         elif (command == "search for authors"):
             author.authorHandler(db, dblp, client)
+        
+        elif (command == "select author"):
+            author.authorSelect(db, dblp, client)
             
         elif (command == "list venues"):
             venue.venueHandler(db, dblp, client)
             
         elif (command == "add an article"):
             addArticle.addArticleHandler(db, dblp, client)
+            
+
+            
+            
         elif (command == "exit"):
             break
         

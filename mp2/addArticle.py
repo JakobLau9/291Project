@@ -12,12 +12,17 @@ def addArticleHandler(db, dblp, client):
     # references should be set to an empty array and n_citations should be set to zero.
     
     
-    unique_id = input("Please enter an id: ")
+    unique_id = input("Please enter a unique id: ")
+    unique = list(db.dblp.find({"id": unique_id}))
+    if not (unique == []):
+        print("ID is not unique.")
+        return 
+    
     title = input("Please enter a title: ")
-    authors = input("Please enter a space separated list of authors: ")
+    authors = input("Please enter a comma separated list of authors: ")
     year = input("Please enter a year: ")
     
-    author_list = authors.split()
+    author_list = authors.split(",")
     #id example 00701b05-684f-45f9-b281-425abfec482c
 
     
