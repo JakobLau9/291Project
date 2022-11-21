@@ -23,7 +23,9 @@ def main():
     
     # python3 phase2.py port
     # python3 phase2.py 27017
-    
+    if len(sys.argv) != 2:
+        print("Please follow the format: python3 phase2.py <port>")
+        quit()
     port = sys.argv[1]
     
     client = MongoClient("mongodb://localhost:" + port)
