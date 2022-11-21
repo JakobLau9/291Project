@@ -7,10 +7,12 @@ def authorHandler(db, dblp, client):
     # print("author")
     keyword = input("Please enter a keyword: ")
     # keyword = "merlo"
-    search_term = ""
-    search_term += "\\"
-    search_term += keyword
-    search_term += "\\"
+    # search_term = ""
+    # search_term += "\\"
+    # search_term += keyword
+    # search_term += "\\"
+    
+    search_term = '"' + keyword + '"'
     
     results = db.dblp.find({"$text": {"$search": search_term}}, {"authors": 1})
     author_dict = {}
@@ -34,18 +36,27 @@ def authorHandler(db, dblp, client):
     return
 
 
+
+# can't get elem match to work
+# data = db.dblp.find({"authors": { "$elemMatch": "Tim"} })
+
+# starting with something like this might be faster LOL OOPS
+# but with match instead of find cuz we need aggregation for sorting
+# data = db.dblp.find( { "authors": "Tim" } 
+
 def authorSelect(db, dblp, client):
     # The user should be able to select an author and see the title, year and venue of all articles by that author. 
     # The result should be sorted based on year with more recent articles shown first.
-    \
+    
     keyword = input("Please enter a name: ")
     # keyword = "merlo"
-    search_term = ""
-    search_term += "\\"
-    search_term += keyword
-    search_term += "\\"
-    
+    # search_term = ""
+    # search_term += "\\"
+    # search_term += keyword
+    # search_term += "\\"
     # results = db.dblp.find({"$text": {"$search": search_term}})
+    
+    search_term = '"' + keyword + '"'
     
     results = (db.dblp.aggregate([
         {"$match": {"$text": {"$search": search_term}}},

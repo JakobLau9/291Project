@@ -50,8 +50,8 @@ def createCollection():
     # we can only have 1 text index
     # this is ok for search for articles
     # for search for authors you need to get rid of the other text matches
-    db.dblp.create_index([('authors', TEXT), ('title', TEXT), ('abstract', TEXT), ('venue', TEXT), ('year', TEXT)], name='author_index')
-    
+    db.dblp.create_index([('authors', TEXT), ('title', TEXT), ('abstract', TEXT), ('venue', TEXT), ('year', TEXT), ('references', TEXT)], name='author_index')
+    # db.dblp.create_index("references", name='ref_index')
     #unique id index for add article checking
     db.dblp.create_index( "id", unique=True, name='uniq_id_index' )
     

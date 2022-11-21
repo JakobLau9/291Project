@@ -32,6 +32,7 @@ def main():
     
     cmds = '''
         search for articles
+        select article
         search for authors
         select author
         list venues
@@ -48,6 +49,9 @@ def main():
         
         elif (command == "search for articles"):
             article.articleHandler(db, dblp, client)
+            
+        elif (command == "select article"):
+            article.selectArticle(db, dblp, client)
             
         elif (command == "search for authors"):
             author.authorHandler(db, dblp, client)
