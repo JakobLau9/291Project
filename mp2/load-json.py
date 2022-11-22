@@ -18,6 +18,10 @@ def createCollection():
     global dblp
     global client
     
+    if len(sys.argv) != 3:
+        print("Please follow the format: python3 load-json.py <json file> <port>")
+        quit()
+
     file_name = sys.argv[1] # example: dblp-ref-10.json
     port = sys.argv[2] # example: 27017
     
