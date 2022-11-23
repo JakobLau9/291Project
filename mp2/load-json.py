@@ -40,7 +40,7 @@ def createCollection():
     # insert json file data into collection
     # insert json file data into collection
     print("importing ...")
-    cmd = f"mongoimport --port {port} --db 291db --collection dblp --file {file_name} --batchSize 100"
+    cmd = f"mongoimport --port {port} --db 291db --collection dblp --file {file_name} --batchSize 100000"
     os.system(cmd)
     
     
@@ -48,16 +48,18 @@ def createCollection():
     # create indexes
     db.dblp.drop_indexes()
     print("creating indexes ...")
-    
-    # change year to string so we can text search on it
-    db.dblp.update_many(filter={ }, update=[{'$set': {'year': { '$toString': '$year'}}}], upsert=False)
-    print("converted year")
-    db.dblp.create_index([('authors', TEXT), ('title', TEXT), ('abstract', TEXT), ('venue', TEXT), ('year', TEXT), ('references', TEXT)], name='author_index')
-    print("created text index")
     # db.dblp.create_index("references", name='ref_index')
     #unique id index for add article checking
     db.dblp.create_index( "id", unique=True, name='uniq_id_index' )
     print("created unique id index")
+    db.dblp.create_index([('authors', TEXT), ('title', TEXT), ('abstract', TEXT), ('venue', TEXT), ('references', TEXT)], name='author_index')
+    print("created text index")
+    # change year to string so we can text search on it
+    db.dblp.update_many(filter={ }, update=[{'$set': {'year': { '$toString': '$year'}}}], upsert=False)
+    print("converted year")
+    
+    
+    
     
     # displaying all indexes
     info = db.dblp.index_information()
