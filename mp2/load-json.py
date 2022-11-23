@@ -50,7 +50,7 @@ def createCollection():
     print("creating indexes ...")
     # db.dblp.create_index("references", name='ref_index')
     #unique id index for add article checking
-    db.dblp.create_index( "id", unique=True, name='uniq_id_index' )
+    # db.dblp.create_index( "id", unique=True, name='uniq_id_index' )
     print("created unique id index")
     db.dblp.create_index([('authors', TEXT), ('title', TEXT), ('abstract', TEXT), ('venue', TEXT), ('references', TEXT)], name='author_index')
     print("created text index")

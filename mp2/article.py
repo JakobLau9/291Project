@@ -34,11 +34,12 @@ def selectArticle(db, dblp, client):
     for item in data:
         pprint(item)
     
+    search = f'"{selection}"'
     print("--------------referenced articles--------------")
     # don't know if it references should have a text index or not
     # search all references arrays for this article id
     # if this id is found in a ref array display the otherh articles information
-    refby = db.dblp.find({"$text": {"$search": selection}}, {"_id":0, "id": 1, "title": 1, "year": 1}) 
+    refby = db.dblp.find({"$text": {"$search": search}}, {"_id":0, "id": 1, "title": 1, "year": 1}) 
     for i in refby:
         print(i)
     return
