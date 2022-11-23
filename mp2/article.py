@@ -35,7 +35,7 @@ def selectArticle(db, dblp, client):
         pprint(item)
     
     search = f'"{selection}"'
-    print("--------------referenced articles--------------")
+    print("--------------articles that reference selected article--------------")
     # don't know if it references should have a text index or not
     # search all references arrays for this article id
     # if this id is found in a ref array display the otherh articles information

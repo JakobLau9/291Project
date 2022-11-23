@@ -14,14 +14,36 @@ def venueHandler(db, dblp, client):
     # maybe store the venue:count in a dictionary if we're gonna do two separate queries
     
     # number of articles in that venue
-    y = db.dblp.aggregate([{"$group" : {"_id" : "$venue", "count":{"$sum":1}}}])
+    #y = db.dblp.aggregate([{"$group" : {"_id" : "$venue", "count":{"$sum":1}}}])
     # yikes = db.dblp.aggregate([{"$group": {"_id":{"v":"$venue"}, "num": {"$sum":1}}}])
+
+    n = int(input("How many venues would you like to see: "))
+
+    test = db.dblp.aggregate([
+        {'$match': {
+            'venue': {
+                '$ne':''
+            }
+        }},
+        { '$group': {
+            '_id': '$venue',
+            'articleCount': {'$sum': 1}
+        }
+        },
+        {'$sort': {'articleCount': -1}}
+    ])
+
+    count = 0
+    for item in test:
+        count = count + 1
+        if (count > n):
+            break
+        print(item)
     
-    
-    for item in y:
-        count = item["count"]
-        v = item["_id"]
-        print(f"{v} : {count}")
+    #for item in y:
+    #    count = item["count"]
+    #    v = item["_id"]
+    #    print(f"{v} : {count}")
     
     
     ###### NOT FAST ENOUGH FOR THE 1 MILLION
