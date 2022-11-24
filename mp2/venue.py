@@ -104,7 +104,7 @@ def venueHandler(db, dblp, client):
     #print("\n".join("{}\t{}".format(k, v) for k, v in venue_articles.items()))
 
 
-
+    # The final dict will contain the venue as well as the article count and reference count
     final_dict = {}
     for key, value in venue_articles.items():
         articleCount = 0
@@ -115,9 +115,10 @@ def venueHandler(db, dblp, client):
             referenceCount += referencesAmount
         final_dict[key] = [articleCount, referenceCount]
     
-    
+    # Sorting the dictionary by reference count
     sorted_dict = sorted(final_dict.items(), key = lambda item: item[1], reverse = True)
 
+    # Outputting the dictionary 
     count = 0
     for key, value in sorted_dict:
         count += 1
