@@ -50,13 +50,14 @@ def createCollection():
     print("creating indexes ...")
     # db.dblp.create_index("references", name='ref_index')
     #unique id index for add article checking
-    # db.dblp.create_index( "id", unique=True, name='uniq_id_index' )
+    db.dblp.create_index( "id", unique=True, name='uniq_id_index' )
     print("created unique id index")
-    db.dblp.create_index([('authors', TEXT), ('title', TEXT), ('abstract', TEXT), ('venue', TEXT), ('references', TEXT)], name='author_index')
-    print("created text index")
     # change year to string so we can text search on it
     db.dblp.update_many(filter={ }, update=[{'$set': {'year': { '$toString': '$year'}}}], upsert=False)
     print("converted year")
+    
+    db.dblp.create_index([('authors', TEXT), ('title', TEXT), ('abstract', TEXT), ('venue', TEXT), ('references', TEXT), ('year', TEXT)], name='text_index')
+    print("created text index")
     
     
     

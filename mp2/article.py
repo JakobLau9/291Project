@@ -13,6 +13,7 @@ def articleHandler(db, dblp, client):
     search_str = ""
     for word in keywords_list:
         search_str += "\"" + word + "\" "
+        
     search_str.strip()
     
     # this will return an article where all the keywords match
