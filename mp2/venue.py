@@ -17,28 +17,28 @@ def venueHandler(db, dblp, client):
     #y = db.dblp.aggregate([{"$group" : {"_id" : "$venue", "count":{"$sum":1}}}])
     # yikes = db.dblp.aggregate([{"$group": {"_id":{"v":"$venue"}, "num": {"$sum":1}}}])
 
-    n = int(input("How many venues would you like to see: "))
+    # n = int(input("How many venues would you like to see: "))
 
-    test = db.dblp.aggregate([
-        {'$match': {
-            'venue': {
-                '$ne':''
-            }
-        }},
-        { '$group': {
-            '_id': '$venue',
-            'articleCount': {'$sum': 1}
-        }
-        },
-        {'$sort': {'articleCount': -1}}
-    ])
+    # test = db.dblp.aggregate([
+    #     {'$match': {
+    #         'venue': {
+    #             '$ne':''
+    #         }
+    #     }},
+    #     { '$group': {
+    #         '_id': '$venue',
+    #         'articleCount': {'$sum': 1}
+    #     }
+    #     },
+    #     {'$sort': {'articleCount': -1}}
+    # ])
 
-    count = 0
-    for item in test:
-        count = count + 1
-        if (count > n):
-            break
-        print(item)
+    # count = 0
+    # for item in test:
+    #     count = count + 1
+    #     if (count > n):
+    #         break
+    #     print(item)
     
     #for item in y:
     #    count = item["count"]
@@ -49,24 +49,24 @@ def venueHandler(db, dblp, client):
     ###### NOT FAST ENOUGH FOR THE 1 MILLION
     ##### NEED TO MAKE A VIEW OR WRTIE SOME HARD QUERY
     
-    # print("venue")
-    # yikes = db.dblp.find({}, {"id":1, "venue":1, "_id":0})
+    print("venue")
+    yikes = db.dblp.find({}, {"id":1, "venue":1, "_id":0})
     
-    # ven_dict = {}
+    ven_dict = {}
     
-    # for x in yikes:
-    #     aid = x["id"]
-    #     venue = x["venue"]
-    #     results = db.dblp.find({"$text": {"$search": aid}})
-    #     for article in results:
-    #         # print(article)
-    #         # ref_article_id = article["id"]
-    #         # if (ref_article_id == aid):
-    #         if (venue in ven_dict):
-    #             ven_dict[venue] +=1
-    #         else:
-    #             ven_dict[venue] = 1
+    for x in yikes:
+        aid = x["id"]
+        venue = x["venue"]
+        results = db.dblp.find({"$text": {"$search": aid}})
+        for article in results:
+            print(article)
+            ref_article_id = article["id"]
+            # if (ref_article_id == aid):
+            if (venue in ven_dict):
+                ven_dict[venue] +=1
+            else:
+                ven_dict[venue] = 1
 
-    # print(ven_dict)
+    print(ven_dict)
             
     return
