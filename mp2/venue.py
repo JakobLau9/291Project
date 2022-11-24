@@ -76,44 +76,80 @@ def venueHandler(db, dblp, client):
     references = {}
 
     for x in db.dblp.find():
-        aid = x['id']
 
-        if 'venue' in x and x['venue'] != "":
-            vid = x['venue']
-            if vid in venue_articles:
-                venue_articles[vid].append(aid)
+        article = x['id']
+
+        # Filing up venue articles dictionary
+        if 'venue' in x:
+            venue = x['venue']
+            if venue in venue_articles:
+                venue_articles[venue].append(article)
             else:
-                venue_articles[vid] = [aid]
-        else:
-            continue
+                venue_articles[venue] = [article]
 
-        if aid not in references:
-            references[aid] = []
+        
+        if article not in references:
+            references[article] = []
 
+        # Filling up references dictionary
         if 'references' in x:
-            referenceList = x['references']
-            for y in referenceList:
-                if y in references:
-                    references[y].append(aid)
+            referencesList = x['references']
+
+            for reference in referencesList:
+                if reference in references:
+                    references[reference].append(article)
                 else:
-                    references[y] = [aid]
-        else:
-            continue
+                    references[reference] = [article]
 
     
     #print("\n".join("{}\t{}".format(k, v) for k, v in venue_articles.items()))
 
+    test = db.dblp.aggregate([
+       {'$match': {
+            'venue': {
+                '$ne':''
+            }
+        }},
+        { '$group': {
+            '_id': '$venue',
+            'articleCount': {'$sum': 1}
+        }
+        }
+    ])
+
+    final_dict = {}
+    for venue in test:
+        venue_name = venue['_id']
+        articles = venue_articles[venue_name]
+        # Used set() here to make sure we dont double count
+        ref_articles = set()
+        referenceCount = 0
+        articleCount = 0
+        for article in articles:
+            references1 = references[article]
+            articleCount +=1
+            for aid in references1:
+                if aid not in ref_articles:
+                    referenceCount += 1
+                    ref_articles.add(aid)
+        final_dict[venue_name] = [referenceCount, articleCount]
+
+
 
     # The final dict will contain the venue as well as the article count and reference count
-    final_dict = {}
-    for key, value in venue_articles.items():
-        articleCount = 0
-        referenceCount = 0
-        for item in value:
-            articleCount += 1
-            referencesAmount = len(references[item])
-            referenceCount += referencesAmount
-        final_dict[key] = [articleCount, referenceCount]
+    #final_dict = {}
+    #for key, value in venue_articles.items():
+    #    articleCount = 0
+    #    referenceCount = 0
+    #    ref_articles = set()
+    #    for item in value:
+    #        articleCount += 1
+    #        for article in references[item]:
+    #            if article not in ref_articles:
+    #                referenceCount+=1
+    #                ref_articles.add(article)
+
+    #    final_dict[key] = [referenceCount, articleCount]
     
     # Sorting the dictionary by reference count
     sorted_dict = sorted(final_dict.items(), key = lambda item: item[1], reverse = True)
@@ -124,7 +160,7 @@ def venueHandler(db, dblp, client):
         count += 1
         if (count > n):
             break
-        print("Venue: " + key + " Article Count: " + str(value[0]) + " References Count: " + str(value[1]))
+        print("Venue: " + key + " Article Count: " + str(value[1]) + " References Count: " + str(value[0]))
 
 
     return
