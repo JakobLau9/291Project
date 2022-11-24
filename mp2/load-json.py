@@ -44,7 +44,7 @@ def createCollection():
     os.system(cmd)
     
     
-    
+    # help with text indexes from source: https://stackoverflow.com/questions/48371016/pymongo-how-to-use-full-text-search
     # create indexes
     db.dblp.drop_indexes()
     print("creating indexes ...")
