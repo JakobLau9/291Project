@@ -34,14 +34,21 @@ def selectArticle(db, dblp, client):
     for item in data:
         pprint(item)
     
-    search = f'"{selection}"'
+    
     print("--------------articles that reference selected article--------------")
     # don't know if it references should have a text index or not
     # search all references arrays for this article id
     # if this id is found in a ref array display the otherh articles information
-    refby = db.dblp.find({"$text": {"$search": search}}, {"_id":0, "id": 1, "title": 1, "year": 1}) 
+    refby = db.dblp.find({"$text": {"$search": selection}}, {"_id":0, "id": 1, "title": 1, "year": 1, "references": 1}) 
     for i in refby:
-        print(i)
+        if "references" in i:
+            references = i["references"]
+            if (selection in references):
+                # it's a match
+                id_string = i["id"]
+                title_string = i["title"]
+                year_string = i["year"]
+                print(f"id: {id_string}, title: {title_string}, year: {year_string}")
     return
                        
                        
